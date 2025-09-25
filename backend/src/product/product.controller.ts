@@ -1,11 +1,21 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('products')  // đặt trên class
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'minPrice', required: false, type: Number })
+  @ApiQuery({ name: 'maxPrice', required: false, type: Number })
+  @ApiQuery({ name: 'diaChi', required: false, type: String })
+  @ApiQuery({ name: 'minReviews', required: false, type: Number })
+  @ApiQuery({ name: 'maxReviews', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   async getAll(
     @Query('search') search?: string,
     @Query('minPrice') minPrice?: string,
