@@ -17,4 +17,3 @@ model Product {
   mo_ta String?
   @@map("products")
 }
-
