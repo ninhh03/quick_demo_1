@@ -43,7 +43,7 @@
       <!-- Search -->
       <div class="mb-6">
         <div class="flex items-center bg-white shadow rounded-xl overflow-hidden">
-          <input v-model="search" @keyup.enter="applyFilters" type="text" placeholder="Tìm kiếm"
+          <input v-model="search" type="text" placeholder="Tìm kiếm"
             class="flex-1 px-4 py-3 outline-none" />
 
         </div>
@@ -122,14 +122,7 @@
         </p>
       </div>
 
-      <!-- Dev debug (bật khi cần) -->
-      <pre v-if="devMode" class="mt-4 bg-yellow-50 p-3 rounded text-sm text-gray-700">
-loading: {{ loading }}
-page: {{ page }} | limit: {{ limit }}
-totalPages: {{ totalPages }} | totalCount: {{ totalCount }}
-lastParams: {{ JSON.stringify(lastParams) }}
-apiRaw: {{ JSON.stringify(lastApiResponse, null, 2) }}
-      </pre>
+
     </main>
   </div>
 </template>
@@ -145,7 +138,6 @@ const route = useRoute()
 /* ---------- config ---------- */
 const limit = 9
 const debounceMs = 500
-const devMode = false
 
 /* ---------- reactive state ---------- */
 const products = ref<any[]>([])
@@ -163,9 +155,9 @@ const filters = ref({
   maxReviews: null as number | null,
 })
 
-/* for debug UI */
-const lastParams = ref<any>(null)
-const lastApiResponse = ref<any>(null)
+onMounted(() => {
+  document.title = "Chợ Tốt"
+})
 
 /* ---------- helpers ---------- */
 const parsePagination = (payload: any) => {
@@ -201,18 +193,17 @@ const loadProducts = async () => {
       ...(filters.value.maxPrice != null ? { maxPrice: filters.value.maxPrice } : {}),
       ...(filters.value.minReviews != null ? { minReviews: filters.value.minReviews } : {}),
       ...(filters.value.maxReviews != null ? { maxReviews: filters.value.maxReviews } : {}),
-      t: Date.now(),
+      
     }
 
-    lastParams.value = params
     const res = await getProducts(params)
-    lastApiResponse.value = res
+
 
     const items = res?.data ?? res?.items ?? res?.rows ?? []
     products.value = Array.isArray(items) ? items : []
 
     const { total, totalPages: tp } = parsePagination(res ?? {})
-    totalCount.value = total || (Array.isArray(items) ? res?.pagination?.total ?? items.length : items.length)
+    totalCount.value = total || items.length
     totalPages.value = tp || Math.max(1, Math.ceil(totalCount.value / limit))
 
 
